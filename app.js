@@ -114,11 +114,11 @@ require('dotenv').config();
 const app = express();
 
 const client = new Client({
-    host: "62.72.46.248",
-    user: "wmad_students",
-    port: 5432,
-    password: "WMAD@#students2023",
-    database: "pbls"
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    port: process.env.DB_PORT,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DATABASE
 });
 
 app.use(express.json());
