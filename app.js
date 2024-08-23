@@ -110,7 +110,7 @@
 
 const express = require('express');
 const { Client } = require('pg');
-require('dotenv').config(); // For environment variables
+require('dotenv').config(); 
 const app = express();
 
 const client = new Client({
