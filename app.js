@@ -63,26 +63,41 @@ app.get('/api/users/:id', async (req, res) => {
 app.post('/api/users', async (req, res) => {
     const data = req.body;
 
+    // Log incoming request for debugging
+    console.log('Received data:', data);
+
     // Validate data (simple validation)
-    if (!Array.isArray(data) || data.some(user => !user.id || !user.username || !user.email)) {
+    if (!Array.isArray(data) || data.some(user => 
+        typeof user.id !== 'number' ||
+        typeof user.username !== 'string' ||
+        typeof user.email !== 'string'
+    )) {
         return res.status(400).send('Invalid data format');
     }
 
     try {
         await client.query('BEGIN'); // Start transaction
+
+        // Execute queries
         const queries = data.map(item => {
             const { id, username, email } = item;
             return client.query('INSERT INTO users(id, username, email) VALUES ($1, $2, $3)', [id, username, email]);
         });
+
         await Promise.all(queries);
         await client.query('COMMIT'); // Commit transaction
+
         res.send("Users added successfully");
     } catch (error) {
         await client.query('ROLLBACK'); // Rollback transaction on error
-        console.error(error.message);
-        res.status(500).send('Error adding users');
+
+        // Log detailed error information
+        console.error('Error adding users:', error);
+
+        res.status(500).send(`Error adding users: ${error.message}`);
     }
 });
+
 
 // PUT (update) an existing User
 app.put('/api/users/:id', async (req, res) => {
