@@ -1,29 +1,27 @@
 
 // const express = require('express');
 // const { Client } = require('pg');
+// require('dotenv').config(); 
 // const app = express();
 
 // const client = new Client({
-//     host: "62.72.46.248",
-//     user: "wmad_students",
-//     port: 5432,
-//     password: "WMAD@#students2023",
-//     database: "pbls"
+//     host: process.env.DB_HOST,
+//     user: process.env.DB_USER,
+//     port: process.env.DB_PORT,
+//     password: process.env.DB_PASSWORD,
+//     database: process.env.DB_DATABASE
 // });
-// module.exports = client;
 
 // app.use(express.json());
 
 // client.connect(err => {
 //     if (err) {
 //         console.error('Connection error', err.stack);
-//         return;
+//         process.exit(1); // Exit the process if unable to connect
 //     } else {
 //         console.log('Connected to the database');
 //     }
 // });
-
-// module.exports = client;
 
 // // GET all Users
 // app.get('/api/users', async (req, res) => {
@@ -56,35 +54,40 @@
 // app.post('/api/users', async (req, res) => {
 //     const data = req.body;
 //     try {
+//         await client.query('BEGIN'); // Start transaction
 //         const queries = data.map(item => {
 //             const { id, username, email } = item;
 //             return client.query('INSERT INTO users(id, username, email) VALUES ($1, $2, $3)', [id, username, email]);
 //         });
 //         await Promise.all(queries);
+//         await client.query('COMMIT'); // Commit transaction
 //         res.send("Users added successfully");
 //     } catch (error) {
+//         await client.query('ROLLBACK'); // Rollback transaction on error
 //         console.error(error.message);
 //         res.status(500).send(error.message);
 //     }
 // });
 
 // // PUT (update) an existing User
-
-// app.put('/api/users/:id', async (req, res) => { 
+// app.put('/api/users/:id', async (req, res) => {
 //     const id = req.params.id;
 //     const { username, email } = req.body;
 
-//     const update_query = "UPDATE users SET username = $2, email = $3 WHERE id = $1 RETURNING *";
+//     const update = "UPDATE users SET username = $2, email = $3 WHERE id = $1 RETURNING *";
     
 //     try {
-//         const result = await client.query(update_query, [id, username, email]);
-//         res.json(result.rows[0]);
+//         const result = await client.query(update, [id, username, email]);
+//         if (result.rows.length === 0) {
+//             res.status(404).send('The user with the given ID was not found.');
+//         } else {
+//             res.json(result.rows[0]);
+//         }
 //     } catch (err) {
 //         console.error(err.message);
 //         res.status(500).send('Error updating user data');
 //     }
 // });
-
 
 // // DELETE a User
 // app.delete('/api/users/:id', async (req, res) => {
@@ -103,16 +106,27 @@
 // });
 
 // // Start the server
-// const PORT = process.env.PORT || 3000;
+// const PORT = process.env.PORT || 5000;
 // app.listen(PORT, () => {
 //     console.log(`Server is running on port ${PORT}`);
 // });
 
 const express = require('express');
 const { Client } = require('pg');
-require('dotenv').config(); 
+const cors = require('cors');
+const morgan = require('morgan');
+const helmet = require('helmet');
+require('dotenv').config();
+
 const app = express();
 
+// Middleware
+app.use(cors());
+app.use(express.json());
+app.use(morgan('dev'));
+app.use(helmet()); // Adds security headers
+
+// Database client setup
 const client = new Client({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
@@ -121,8 +135,7 @@ const client = new Client({
     database: process.env.DB_DATABASE
 });
 
-app.use(express.json());
-
+// Connect to the database
 client.connect(err => {
     if (err) {
         console.error('Connection error', err.stack);
@@ -162,6 +175,12 @@ app.get('/api/users/:id', async (req, res) => {
 // POST Users
 app.post('/api/users', async (req, res) => {
     const data = req.body;
+
+    // Validate data (simple validation)
+    if (!Array.isArray(data) || data.some(user => !user.id || !user.username || !user.email)) {
+        return res.status(400).send('Invalid data format');
+    }
+
     try {
         await client.query('BEGIN'); // Start transaction
         const queries = data.map(item => {
@@ -174,7 +193,7 @@ app.post('/api/users', async (req, res) => {
     } catch (error) {
         await client.query('ROLLBACK'); // Rollback transaction on error
         console.error(error.message);
-        res.status(500).send(error.message);
+        res.status(500).send('Error adding users');
     }
 });
 
@@ -182,6 +201,10 @@ app.post('/api/users', async (req, res) => {
 app.put('/api/users/:id', async (req, res) => {
     const id = req.params.id;
     const { username, email } = req.body;
+
+    if (!username || !email) {
+        return res.status(400).send('Invalid data format');
+    }
 
     const update = "UPDATE users SET username = $2, email = $3 WHERE id = $1 RETURNING *";
     
