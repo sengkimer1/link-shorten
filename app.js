@@ -1,4 +1,3 @@
-
 const express = require('express');
 const crypto = require('crypto');
 const app = express();
@@ -25,7 +24,7 @@ app.post('/api/shorten', async (req, res) => {
   
     try {
         const shortUrl = crypto.randomBytes(4).toString('hex');
-        const expiresAt = new Date(Date.now() + 60 * 60000); // 1 hour from now
+        const expiresAt = new Date(Date.now() + 60 * 60000); 
   
         await pool.query(
             'INSERT INTO shortened_urls (original_url, short_url, expires_at) VALUES ($1, $2, $3)',
@@ -73,10 +72,4 @@ app.get('/api/shortUrl/:shortUrl', async (req, res) => {
     }
 });
 
-
-
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
-
+module.exports = app;
