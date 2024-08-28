@@ -33,7 +33,7 @@ app.post('/api/shorten', async (req, res) => {
 
         res.status(200).json({
             code: 200,
-            shortened_link: `https://your-domain.com/${shortUrl}`,
+            shortened_link: `https://${shortUrl}`,
             lifespan: 60
         });
     } catch (error) {
