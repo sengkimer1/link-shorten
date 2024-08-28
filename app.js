@@ -14,26 +14,26 @@ const pool = new Pool({
 
 app.post('/api/shorten', async (req, res) => {
     const { link } = req.body;
-  
+
     if (!link) {
         return res.status(400).json({
             code: 400,
             error: 'Link is required'
         });
     }
-  
+
     try {
         const shortUrl = crypto.randomBytes(4).toString('hex');
         const expiresAt = new Date(Date.now() + 60 * 60000); 
-  
+
         await pool.query(
             'INSERT INTO shortened_urls (original_url, short_url, expires_at) VALUES ($1, $2, $3)',
             [link, shortUrl, expiresAt]
         );
-  
+
         res.status(200).json({
             code: 200,
-            shortened_link: `https://${shortUrl}`,
+            shortened_link: `https://your-domain.com/${shortUrl}`,
             lifespan: 60
         });
     } catch (error) {
@@ -73,4 +73,3 @@ app.get('/api/shortUrl/:shortUrl', async (req, res) => {
 });
 
 module.exports = app;
-
