@@ -4,14 +4,13 @@ const router = express.Router();
 const pool = require('../db'); // Ensure this path is correct
 
 
-
 // Create a new user (Admin)
 router.post('/users', async (req, res) => {
-  const { name, email, password } = req.body;
+  const { username, email, password } = req.body;
   try {
     const result = await pool.query(
-      'INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING *',
-      [name, email, password]
+      'INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING *',
+      [username, email, password]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -49,11 +48,11 @@ router.get('/users/:id', async (req, res) => {
 // Update a user by ID (Admin)
 router.put('/users/:id', async (req, res) => {
   const { id } = req.params;
-  const { name, email, password } = req.body;
+  const { username, email, password } = req.body;
   try {
     const result = await pool.query(
-      'UPDATE users SET name = $1, email = $2, password = $3 WHERE id = $4 RETURNING *',
-      [name, email, password, id]
+      'UPDATE users SET username = $1, email = $2, password = $3 WHERE id = $4 RETURNING *',
+      [username, email, password, id]
     );
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'User not found' });
