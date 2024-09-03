@@ -1,12 +1,8 @@
 const express = require('express');
 const crypto = require('crypto');
 const router = express.Router();
-const { Pool } = require('pg');
+const pool = require('../db');
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: false,  // Disable SSL
-});
 
 router.post('/', async (req, res) => {
     const { link } = req.body;
@@ -20,7 +16,8 @@ router.post('/', async (req, res) => {
         res.status(200).json({
             code: 200,
             shortened_link: `https://link-shortener-express.vercel.app/api/shorten/${shortUrl}`,
-            lifespan: 60
+            lifespan: 60,
+            // expires_at: expiresAt.toISOString(),
         });
     } catch (error) {
         console.error("Error during POST /api/shorten:", error.stack);
