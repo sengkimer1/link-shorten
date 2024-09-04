@@ -16,7 +16,7 @@ app.use(bodyParser.json());
 app.use('/auth', authRoutes);
 app.use('/api/shorten', urlRoutes);
 app.use('/api/admin', adminRouter);
-app.use('/api/shorten', urltest);
+app.use('/api', urltest);
 
 const PORT = process.env.PORT ;
 app.listen(PORT, () => {
