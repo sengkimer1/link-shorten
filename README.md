@@ -33,7 +33,7 @@ URL:"https://link-shortener-express.vercel.app/api/shorten/:shortUrl/expires"
 For page Admin CRUD API
 This is link for post admin
 methob POST
-URL:"https://link-shortener-express-1.vercel.app/api/admin/users"
+URL:"https://link-shortener-express.vercel.app/api/admin/users"
 REQUEST
 {
     "username":"laiheang",
@@ -43,15 +43,15 @@ REQUEST
 
 This is link for get admin
 methob GET
-URl:"https://link-shortener-express-1.vercel.app/api/admin/users"
+URl:"https://link-shortener-express.vercel.app/api/admin/users"
 
 This is link for get admin by Id
 methob GET
-URl:"https://link-shortener-express-1.vercel.app/api/admin/users/1"
+URl:"https://link-shortener-express.vercel.app/api/admin/users/1"
 
 This is link for update admin
 methob PUT
-URL:"https://link-shortener-express-1.vercel.app/api/admin/users/1"
+URL:"https://link-shortener-express.vercel.app/api/admin/users/1"
 REQUEST
 {
     "username":"laiheang",
