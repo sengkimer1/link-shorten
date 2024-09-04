@@ -4,8 +4,9 @@ const bodyParser = require('body-parser');
 require('dotenv').config();
 
 const authRoutes = require('./routes/authRoutes');
-const urlRoutes = require('./routes/urlRoutes');
+// const urlRoutes = require('./routes/urlRoutes');
 const adminRouter = require('./routes/adminRouter');
+const urltest = require('./routes/urltest')
 
 const app = express();
 
@@ -13,8 +14,9 @@ app.use(cors());
 app.use(bodyParser.json());
 
 app.use('/auth', authRoutes);
-app.use('/api/shorten', urlRoutes);
+// app.use('/api/shorten', urlRoutes);
 app.use('/api/admin', adminRouter);
+app.use('/api/shorten', urltest);
 
 const PORT = process.env.PORT ;
 app.listen(PORT, () => {
