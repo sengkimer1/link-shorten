@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../db'); // Ensure this path is correct
 
-
 // Create a new user (Admin)
 router.post('/users', async (req, res) => {
   const { username, email, password } = req.body;
