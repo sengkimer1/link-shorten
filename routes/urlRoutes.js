@@ -85,7 +85,7 @@ router.get('/:shortUrl', async (req, res) => {
     }
 });
 
-router.get('/links',authenticateToken, async (req, res) => {
+router.get('/links', authenticateToken,async (req, res) => {
     try {
         const user = req.user;
         const result = await pool.query(
