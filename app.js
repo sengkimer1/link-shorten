@@ -15,7 +15,7 @@ app.use(bodyParser.json());
 app.use('/auth', authRoutes);
 app.use('/api/shorten', landingRoutes);
 app.use('/api/admin', adminRouter);
-app.use('/api',urlRoutes)
+app.use('/api/short',urlRoutes)
 
 
 const PORT = process.env.PORT ;
