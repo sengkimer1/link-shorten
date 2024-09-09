@@ -10,12 +10,12 @@ router.post('/', async (req, res) => {
     }
     try {
         const shortUrl = crypto.randomBytes(4).toString('hex');
-        const expiresAt = new Date(Date.now() + 120 * 60000);
+        const expiresAt = new Date(Date.now() + 60 * 60000);
         const result = await pool.query('INSERT INTO urls (original_url, short_url, expires_at) VALUES ($1, $2, $3) RETURNING *', [link, shortUrl, expiresAt]);
         console.log("Inserted URL:", result.rows[0]);
         res.status(200).json({
             code: 200,
-            shortened_link: `${shortUrl}`,
+            shortened_link: `https://link-shortener-express.vercel.app/api/shorten/${shortUrl}`,
             lifespan: 60,
         });
     } catch (error) {

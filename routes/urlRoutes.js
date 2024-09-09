@@ -9,7 +9,6 @@ if (!JWT_SECRET) {
     throw new Error('JWT_SECRET is not defined');
 }
 
-// Middleware to authenticate token
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
@@ -19,18 +18,17 @@ const authenticateToken = (req, res, next) => {
 
     jwt.verify(token, JWT_SECRET, (err, user) => {
         if (err) {
-            console.error('JWT Verification Error:', err);
-            return res.status(403).json({ error: 'Invalid token' });
+            console.error('JWT Verification Error:', err.message); 
+            return res.status(403).json({ error: 'Invalid token', details: err.message });
         }
         req.user = user;
         next();
     });
 };
 
+
 // Function to generate short URL
 const generateShortUrl = () => crypto.randomBytes(4).toString('hex');
-
-// POST /convert route for shortening URL
 router.post('/convert', authenticateToken, async (req, res) => {
     const { link } = req.body;
     try {
@@ -39,24 +37,26 @@ router.post('/convert', authenticateToken, async (req, res) => {
         }
 
         const user = req.user;
-        const expiresAt = new Date(Date.now() + 60 * 60000);
-
+        const expiresAt = new Date(Date.now() + 60 * 60000); // 60 minutes from now
         const shortUrl = generateShortUrl();
-        const shortened_link = `${shortUrl}`;
 
         const result = await pool.query(
             'INSERT INTO shortened_urls (user_id, original_url, short_url, expires_at) VALUES ($1, $2, $3, $4) RETURNING *',
-            [user.id, link, shortened_link, expiresAt]
+            [user.id, link, shortUrl, expiresAt]
         );
 
         console.log('Shortened URL inserted:', result.rows[0]);
-        res.status(200).json({ shortened_link });
+
+        // Construct the full shortened URL
+        const shortenedLink = `${shortUrl}`;
+        res.status(200).json({ shortened_link: shortenedLink });
     } catch (error) {
         console.error('Error during POST /convert:', error);
         res.status(500).json({ error: 'Something went wrong', details: error.message });
     }
 });
-router.get('/:shortUrl', authenticateToken, async (req, res) => {
+
+router.get('/:shortUrl', async (req, res) => {
     const { shortUrl } = req.params;
     console.log('Requested shortUrl:', shortUrl); // Log the shortUrl
     try {
@@ -85,8 +85,7 @@ router.get('/:shortUrl', authenticateToken, async (req, res) => {
     }
 });
 
-// GET /links route for retrieving user-specific URLs
-router.get('/links', authenticateToken, async (req, res) => {
+router.get('/links', async (req, res) => {
     try {
         const user = req.user;
         const result = await pool.query(
