@@ -37,7 +37,7 @@ router.post('/convert', authenticateToken, async (req, res) => {
         }
 
         const user = req.user;
-        const expiresAt = new Date(Date.now() + 60 * 60000); // 60 minutes from now
+        const expiresAt = new Date(Date.now() + 60 * 60000);
         const shortUrl = generateShortUrl();
 
         const result = await pool.query(
@@ -82,6 +82,29 @@ router.get('/:shortUrl', async (req, res) => {
     } catch (error) {
         console.error('Error during GET /:shortUrl:', error);
         res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+
+router.get('/:shortUrl/expires', async (req, res) => {
+    const { shortUrl } = req.params;
+    try {
+        const result = await pool.query(
+            'SELECT expires_at FROM shortened_urls WHERE short_url = $1',
+            [shortUrl]
+        );
+        if (result.rows.length > 0) {
+            res.status(200).json({
+                code: 200,
+                shortUrl,
+                expires_at: result.rows[0].expires_at
+            });
+        } else {
+            res.status(404).json({ code: 404, error: 'URL not found' });
+        }
+    } catch (error) {
+        console.error("Error during GET /api/shorten/expires:", error.stack);
+        res.status(500).json({ code: 500, error: 'Internal Server Error' });
     }
 });
 
