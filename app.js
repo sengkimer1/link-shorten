@@ -17,7 +17,6 @@ app.use('/api/shorten', landingRoutes);
 app.use('/api/admin', adminRouter);
 app.use('/api/short',urlRoutes)
 
-
 const PORT = process.env.PORT ;
 app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
