@@ -18,7 +18,7 @@ const authenticateToken = (req, res, next) => {
 
     jwt.verify(token, JWT_SECRET, (err, user) => {
         if (err) {
-            console.error('JWT Verification Error:', err.message); 
+            console.error('JWT Verification Error:', err.message);
             return res.status(403).json({ error: 'Invalid token', details: err.message });
         }
         req.user = user;
@@ -37,15 +37,13 @@ router.post('/convert', authenticateToken, async (req, res) => {
         }
 
         const user = req.user;
-        const expiresAt = new Date(Date.now() + 60 * 60000);
+        const expiresAt = new Date(Date.now() + 120 * 60000);
         const shortUrl = generateShortUrl();
 
         const result = await pool.query(
             'INSERT INTO shortened_urls (user_id, original_url, short_url, expires_at) VALUES ($1, $2, $3, $4) RETURNING *',
             [user.id, link, shortUrl, expiresAt]
         );
-
-        console.log('Shortened URL inserted:', result.rows[0]);
 
         // Construct the full shortened URL
         const shortenedLink = `https://link-shorten-two.vercel.app/api/short/${shortUrl}`;
@@ -58,17 +56,16 @@ router.post('/convert', authenticateToken, async (req, res) => {
 
 router.get('/:shortUrl', async (req, res) => {
     const { shortUrl } = req.params;
-    console.log('Requested shortUrl:', shortUrl); // Log the shortUrl
     try {
-
         const result = await pool.query(
-            `SELECT id,original_url,short_url,expires_at > NOW() AS is_active FROM shortened_urls WHERE short_url = $1`, [shortUrl]);
-        console.log('Query result:', result.rows);
+            `SELECT original_url, expires_at, expires_at > NOW() AS is_active, NOW() AS current_time FROM shortened_urls WHERE short_url = $1`, 
+            [shortUrl]
+        );
 
         if (result.rows.length > 0) {
             const { original_url, is_active, expires_at, current_time } = result.rows[0];
 
-
+            // Log expiration and current time for debugging
             console.log(`URL Expires At: ${expires_at}, Current Time: ${current_time}`);
 
             if (is_active) {
@@ -80,11 +77,10 @@ router.get('/:shortUrl', async (req, res) => {
             res.status(404).json({ code: 404, error: 'URL not found' });
         }
     } catch (error) {
-        console.error('Error during GET /:shortUrl:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        console.error("Error during GET /api/shorten:", error.stack);
+        res.status(500).json({ code: 500, error: 'Internal Server Error' });
     }
 });
-
 
 router.get('/:shortUrl/expires', async (req, res) => {
     const { shortUrl } = req.params;
@@ -108,7 +104,7 @@ router.get('/:shortUrl/expires', async (req, res) => {
     }
 });
 
-router.get('/links', authenticateToken,async (req, res) => {
+router.get('/links', authenticateToken, async (req, res) => {
     try {
         const user = req.user;
         const result = await pool.query(
