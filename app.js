@@ -17,10 +17,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
-    // Use moment-timezone to get current time in Bangkok
     const currentTimeInBangkok = moment().tz('Asia/Bangkok').format();
     console.log('Current Time in Bangkok:', currentTimeInBangkok);
-
     next();
 });
 

@@ -26,9 +26,9 @@ const authenticateToken = (req, res, next) => {
     });
 };
 
-
-// Function to generate short URL
 const generateShortUrl = () => crypto.randomBytes(4).toString('hex');
+
+// Convert long URL to short URL
 router.post('/convert', authenticateToken, async (req, res) => {
     const { link } = req.body;
     try {
@@ -37,7 +37,7 @@ router.post('/convert', authenticateToken, async (req, res) => {
         }
 
         const user = req.user;
-        const expiresAt = new Date(Date.now() + 120 * 60000);
+        const expiresAt = new Date(Date.now() + 120 * 60000); // 2 hours
         const shortUrl = generateShortUrl();
 
         const result = await pool.query(
@@ -45,7 +45,6 @@ router.post('/convert', authenticateToken, async (req, res) => {
             [user.id, link, shortUrl, expiresAt]
         );
 
-        // Construct the full shortened URL
         const shortenedLink = `https://link-shorten-two.vercel.app/api/short/${shortUrl}`;
         res.status(200).json({ shortened_link: shortenedLink });
     } catch (error) {
@@ -54,10 +53,10 @@ router.post('/convert', authenticateToken, async (req, res) => {
     }
 });
 
+// Redirect short URL to original URL
 router.get('/:shortUrl', async (req, res) => {
     const { shortUrl } = req.params;
     try {
-        // Query to fetch URL and expiration status
         const result = await pool.query(
             `SELECT original_url, expires_at, expires_at > NOW() AS is_active 
              FROM shortened_urls 
@@ -68,7 +67,7 @@ router.get('/:shortUrl', async (req, res) => {
         if (result.rows.length > 0) {
             const { original_url, is_active } = result.rows[0];
             if (is_active) {
-                res.redirect(original_url); // URL is active, so redirect
+                res.redirect(original_url);
             } else {
                 res.status(404).json({ code: 404, error: 'URL has expired' });
             }
@@ -81,6 +80,7 @@ router.get('/:shortUrl', async (req, res) => {
     }
 });
 
+// Get expiration date of a short URL
 router.get('/:shortUrl/expires', async (req, res) => {
     const { shortUrl } = req.params;
     try {
@@ -103,6 +103,7 @@ router.get('/:shortUrl/expires', async (req, res) => {
     }
 });
 
+// Uncomment and fix if needed
 // router.get('/links', authenticateToken, async (req, res) => {
 //     try {
 //         const user = req.user;
@@ -122,6 +123,5 @@ router.get('/:shortUrl/expires', async (req, res) => {
 //         res.status(500).json({ error: 'Something went wrong' });
 //     }
 // });
-
 
 module.exports = router;
