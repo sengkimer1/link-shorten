@@ -46,7 +46,7 @@ router.post('/convert', authenticateToken, async (req, res) => {
         );
 
         // Construct the full shortened URL
-        const shortenedLink = `https://link-shortened.vercel.app/api/short/${shortUrl}`;
+        const shortenedLink = `https://link-shorten-two.vercel.app/api/short/${shortUrl}`;
         res.status(200).json({ shortened_link: shortenedLink });
     } catch (error) {
         console.error('Error during POST /convert:', error);
@@ -57,11 +57,24 @@ router.post('/convert', authenticateToken, async (req, res) => {
 router.get('/:shortUrl', async (req, res) => {
     const { shortUrl } = req.params;
     try {
-        const result = await pool.query('SELECT id, original_url, short_url, (expires_at > NOW()) AS is_active FROM shortened_urls WHERE short_url = $1', [shortUrl]);
-        if (result.rows.length > 0 && result.rows[0].is_active) {
-            res.redirect(result.rows[0].original_url);
+        const result = await pool.query(
+            `SELECT original_url, expires_at, expires_at > NOW() AS is_active, NOW() AS current_time FROM shortened_urls WHERE short_url = $1`, 
+            [shortUrl]
+        );
+
+        if (result.rows.length > 0) {
+            const { original_url, is_active, expires_at, current_time } = result.rows[0];
+
+            // Log expiration and current time for debugging
+            console.log(`URL Expires At: ${expires_at}, Current Time: ${current_time}`);
+
+            if (is_active) {
+                res.redirect(original_url); // URL is active, so redirect
+            } else {
+                res.status(404).json({ code: 404, error: 'URL has expired' });
+            }
         } else {
-            res.status(404).json({ code: 404, error: 'URL not found or expired' });
+            res.status(404).json({ code: 404, error: 'URL not found' });
         }
     } catch (error) {
         console.error("Error during GET /api/shorten:", error.stack);
