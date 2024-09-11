@@ -34,7 +34,7 @@ router.get('/:shortUrl', async (req, res) => {
         if (result.rows.length > 0) {
             const { original_url, is_active, expires_at, current_time } = result.rows[0];
 
-            // Log expiration and current time for debugging
+        
             console.log(`URL Expires At: ${expires_at}, Current Time: ${current_time}`);
 
             if (is_active) {

@@ -69,7 +69,7 @@ router.get('/:shortUrl', async (req, res) => {
             console.log(`URL Expires At: ${expires_at}, Current Time: ${current_time}`);
 
             if (is_active) {
-                res.redirect(original_url); // URL is active, so redirect
+                res.redirect(original_url);
             } else {
                 res.status(404).json({ code: 404, error: 'URL has expired' });
             }
