@@ -38,8 +38,6 @@ router.get('/:shortUrl', async (req, res) => {
     }
 });
 
-
-
 router.get('/:shortUrl/expires', async (req, res) => {
     const { shortUrl } = req.params;
     try {

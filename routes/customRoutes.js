@@ -33,7 +33,6 @@ router.post('/custom', authenticateToken, async (req, res) => {
   const userId = req.user.id; 
   
   try {
-    // Check if the custom alias (custom_link) already exists in the database
     const existingLink = await pool.query('SELECT * FROM shortened_urls WHERE short_url = $1', [custom_link]);
     if (existingLink.rows.length > 0) {
       return res.status(400).json({
@@ -52,7 +51,7 @@ router.post('/custom', authenticateToken, async (req, res) => {
       code: 200,
       data: {
         original_link,
-        converted_custom_link: `https://link-shortened.vercel.app/${custom_link}`
+        converted_custom_link: `https://link-shortened.vercel.app/api/${custom_link}`
       }
     });
   } catch (error) {
@@ -74,7 +73,7 @@ router.get('/aliases',async (req, res) => {
     const converted_custom_links = result.rows.reduce((acc, link, index) => {
       acc[index + 1] = {
         original_link: link.original_url,
-        converted_custom_link: `https://link-shortened.vercel.app/${link.short_url}`
+        converted_custom_link: `https://link-shortened.vercel.app/api/${link.short_url}`
       };
       return acc;
     }, {});

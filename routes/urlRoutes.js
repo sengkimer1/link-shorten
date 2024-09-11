@@ -54,22 +54,25 @@ router.post('/convert', authenticateToken, async (req, res) => {
     }
 });
 
+router.use((req, res, next) => {
+    req.currentTime = new Date().toISOString(); // Current time in UTC
+    next();
+});
+
 router.get('/:shortUrl', async (req, res) => {
     const { shortUrl } = req.params;
     try {
         const result = await pool.query(
-            `SELECT original_url, expires_at, expires_at > NOW() AS is_active, NOW() AS current_time FROM shortened_urls WHERE short_url = $1`, 
-            [shortUrl]
+            `SELECT original_url, expires_at AT TIME ZONE 'UTC' AS expires_at_utc, expires_at AT TIME ZONE 'UTC' > $1::timestamptz AS is_active
+             FROM shortened_urls
+             WHERE short_url = $2`, 
+            [req.currentTime, shortUrl]
         );
 
         if (result.rows.length > 0) {
-            const { original_url, is_active, expires_at, current_time } = result.rows[0];
-
-            // Log expiration and current time for debugging
-            console.log(`URL Expires At: ${expires_at}, Current Time: ${current_time}`);
-
+            const { original_url, is_active } = result.rows[0];
             if (is_active) {
-                res.redirect(original_url); // URL is active, so redirect
+                res.redirect(original_url); 
             } else {
                 res.status(404).json({ code: 404, error: 'URL has expired' });
             }
@@ -77,7 +80,7 @@ router.get('/:shortUrl', async (req, res) => {
             res.status(404).json({ code: 404, error: 'URL not found' });
         }
     } catch (error) {
-        console.error("Error during GET /api/shorten:", error.stack);
+        console.error("Error during GET /:shortUrl:", error.stack);
         res.status(500).json({ code: 500, error: 'Internal Server Error' });
     }
 });
@@ -104,25 +107,25 @@ router.get('/:shortUrl/expires', async (req, res) => {
     }
 });
 
-router.get('/links', authenticateToken, async (req, res) => {
-    try {
-        const user = req.user;
-        const result = await pool.query(
-            'SELECT original_url, short_url FROM shortened_urls WHERE user_id = $1',
-            [user.id]
-        );
+// router.get('/links', authenticateToken, async (req, res) => {
+//     try {
+//         const user = req.user;
+//         const result = await pool.query(
+//             'SELECT original_url, short_url FROM shortened_urls WHERE user_id = $1',
+//             [user.id]
+//         );
 
-        const list_of_converted_links = {};
-        result.rows.forEach(row => {
-            list_of_converted_links[row.original_url] = row.short_url;
-        });
+//         const list_of_converted_links = {};
+//         result.rows.forEach(row => {
+//             list_of_converted_links[row.original_url] = row.short_url;
+//         });
 
-        res.status(200).json({ code: 200, list_of_converted_links });
-    } catch (error) {
-        console.error('Error during GET /links:', error);
-        res.status(500).json({ error: 'Something went wrong' });
-    }
-});
+//         res.status(200).json({ code: 200, list_of_converted_links });
+//     } catch (error) {
+//         console.error('Error during GET /links:', error);
+//         res.status(500).json({ error: 'Something went wrong' });
+//     }
+// });
 
 
 module.exports = router;
