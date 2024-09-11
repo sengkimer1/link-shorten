@@ -46,7 +46,7 @@ router.post('/convert', authenticateToken, async (req, res) => {
         );
 
         // Construct the full shortened URL
-        const shortenedLink = `https://link-shorten-two.vercel.app/api/short/${shortUrl}`;
+        const shortenedLink = `https://link-shortened.vercel.app/api/short/${shortUrl}`;
         res.status(200).json({ shortened_link: shortenedLink });
     } catch (error) {
         console.error('Error during POST /convert:', error);

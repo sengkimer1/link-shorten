@@ -15,7 +15,7 @@ router.post('/', async (req, res) => {
         console.log("Inserted URL:", result.rows[0]);
         res.status(200).json({
             code: 200,
-            shortened_link: `https://link-shorten-two.vercel.app/api/shorten/${shortUrl}`,
+            shortened_link: `https://link-shortened.vercel.app/api/shorten/${shortUrl}`,
             lifespan: 60,
         });
     } catch (error) {
