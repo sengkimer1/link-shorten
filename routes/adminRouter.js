@@ -14,7 +14,6 @@ const authenticateToken = (req, res, next) => {
   if (!token) {
     return res.status(401).json({ error: 'No token provided' });
   }
-
   jwt.verify(token, JWT_SECRET, (err, user) => {
     if (err) {
       console.error('JWT Verification Error:', err.message);
