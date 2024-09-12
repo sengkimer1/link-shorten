@@ -57,7 +57,7 @@ router.post('/custom-aliases', authenticateToken, async (req, res) => {
             code: 200,
             data: {
                 original_link,
-                converted_custom_link: `https://link-shorten-two.vercel.app/api/short/${custom_link}`
+                converted_custom_link: `https://link-shorten-two.vercel.app/api/custom/${custom_link}`
             }
         });
     } catch (error) {
@@ -65,6 +65,7 @@ router.post('/custom-aliases', authenticateToken, async (req, res) => {
         res.status(500).json({ response: 500, error: 'Internal Server Error' });
     }
 });
+
 // GET route to retrieve all custom aliases for the logged-in user
 router.get('/custom-aliases', authenticateToken, async (req, res) => {
     const userId = req.user.id;
@@ -78,7 +79,7 @@ router.get('/custom-aliases', authenticateToken, async (req, res) => {
 
         const converted_custom_links = result.rows.map((row) => ({
             original_link: row.original_link,
-            converted_custom_link: `https://link-shorten-two.vercel.app/api/short/${row.custom_link}`
+            converted_custom_link: `https://link-shorten-two.vercel.app/api/custom/${row.custom_link}`
         }));
 
         res.status(200).json({
@@ -87,6 +88,31 @@ router.get('/custom-aliases', authenticateToken, async (req, res) => {
         });
     } catch (error) {
         console.error('Error fetching custom aliases:', error);
+        res.status(500).json({ response: 500, error: 'Internal Server Error' });
+    }
+});
+
+// NEW: GET route to redirect custom links to the original URL
+router.get('/:customLink', async (req, res) => {
+    const { customLink } = req.params;
+
+    try {
+        // Find the original link associated with the custom link
+        const result = await pool.query(
+            'SELECT original_link FROM custom_links WHERE custom_link = $1',
+            [customLink]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Custom link not found' });
+        }
+
+        const originalLink = result.rows[0].original_link;
+
+        // Redirect to the original link
+        res.redirect(originalLink);
+    } catch (error) {
+        console.error('Error during redirection:', error);
         res.status(500).json({ response: 500, error: 'Internal Server Error' });
     }
 });
