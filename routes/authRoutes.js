@@ -10,7 +10,7 @@ if (!JWT_SECRET) {
 }
 // User signup route
 router.post('/signup', async (req, res) => {
-    const { username, email, password ,role="user"} = req.body;
+    const { username, email, password, role = "user" } = req.body;
     console.log('Received signup request:', { username, email });
 
     try {
@@ -20,17 +20,28 @@ router.post('/signup', async (req, res) => {
 
         console.time('Inserting user into database');
         const result = await pool.query(
-            'INSERT INTO users (username, email, password ,role) VALUES ($1, $2, $3) RETURNING *',
-            [username, email, hashedPassword,role] 
+            'INSERT INTO users (username, email, password, role) VALUES ($1, $2, $3, $4) RETURNING *',
+            [username, email, hashedPassword, role]  // Added $4 for role
         );
         console.timeEnd('Inserting user into database');
 
-        res.status(201).json({ message: 'User created successfully', user: result.rows[0] });
+        const user = result.rows[0];
+
+        // Generate JWT token
+        const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '12h' });
+
+        // Send response with user and token
+        res.status(201).json({
+            message: 'User created successfully',
+            user: { id: user.id, username: user.username, email: user.email, role: user.role },
+            token  // Include the token in the response
+        });
     } catch (error) {
         console.error('Signup error:', error.message);
         res.status(500).json({ error: error.message });
     }
 });
+
 
 
 // User login route

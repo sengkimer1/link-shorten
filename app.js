@@ -26,7 +26,7 @@ app.use('/auth', authRoutes);
 app.use('/api/shorten', landingRoutes);
 app.use('/api/admin', adminRouter);
 app.use('/api/short', urlRoutes);
-app.use('/api', customRoutes);
+app.use('/api/custom', customRoutes);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
