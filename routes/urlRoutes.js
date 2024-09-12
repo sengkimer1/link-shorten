@@ -52,7 +52,6 @@ router.post('/convert', authenticateToken, async (req, res) => {
         res.status(500).json({ error: 'Something went wrong', details: error.message });
     }
 });
-
 // Redirect short URL to original URL
 router.get('/:shortUrl', async (req, res) => {
     const { shortUrl } = req.params;
