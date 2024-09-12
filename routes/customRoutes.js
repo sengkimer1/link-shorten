@@ -65,7 +65,6 @@ router.post('/custom-aliases', authenticateToken, async (req, res) => {
         res.status(500).json({ response: 500, error: 'Internal Server Error' });
     }
 });
-
 // GET route to retrieve all custom aliases for the logged-in user
 router.get('/custom-aliases', authenticateToken, async (req, res) => {
     const userId = req.user.id;
