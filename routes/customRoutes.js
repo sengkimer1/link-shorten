@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const pool = require('../db'); // PostgreSQL connection pool
+const pool = require('../db');
 const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -8,6 +8,7 @@ if (!JWT_SECRET) {
     throw new Error('JWT_SECRET is not defined');
 }
 
+// Token authentication middleware
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
@@ -25,70 +26,70 @@ const authenticateToken = (req, res, next) => {
     });
 };
 
-module.exports = { authenticateToken };
+// POST route to create a custom alias
+router.post('/custom-aliases', authenticateToken, async (req, res) => {
+    const { original_link, custom_link } = req.body;
+    const userId = req.user.id;
 
-// POST endpoint for creating a custom alias
-router.post('/custom', authenticateToken, async (req, res) => {
-  const { original_link, custom_link } = req.body;
-  const userId = req.user.id; 
-  
-  try {
-    const existingLink = await pool.query('SELECT * FROM shortened_urls WHERE short_url = $1', [custom_link]);
-    if (existingLink.rows.length > 0) {
-      return res.status(400).json({
-        response: 400,
-        error: 'Custom link already exists'
-      });
+    // Check for missing fields
+    if (!original_link || !custom_link) {
+        return res.status(400).json({ error: 'Original link and custom link are required' });
     }
 
-    // Insert the custom link into the database
-    await pool.query(
-      'INSERT INTO shortened_urls (user_id, original_url, short_url) VALUES ($1, $2, $3)',
-      [userId, original_link, custom_link]
-    );
+    try {
+        // Check if the custom link already exists for the user
+        const result = await pool.query(
+            'SELECT * FROM custom_links WHERE custom_link = $1 AND user_id = $2',
+            [custom_link, userId]
+        );
 
-    res.status(200).json({
-      code: 200,
-      data: {
-        original_link,
-        converted_custom_link: `https://link-shortened.vercel.app/api/${custom_link}`
-      }
-    });
-  } catch (error) {
-    console.error('Error creating custom link:', error);
-    res.status(500).json({
-      response: 500,
-      error: 'Internal server error'
-    });
-  }
+        if (result.rows.length > 0) {
+            return res.status(400).json({ error: 'Custom link already exists' });
+        }
+
+        // Insert new custom link
+        await pool.query(
+            'INSERT INTO public.custom_links(user_id, original_link, custom_link) VALUES ($1, $2, $3)',
+            [userId, original_link, custom_link]
+        );
+
+        res.status(200).json({
+            code: 200,
+            data: {
+                original_link,
+                converted_custom_link: `https://link-shorten-two.vercel.app/api/short/${custom_link}`
+            }
+        });
+    } catch (error) {
+        console.error('Error during custom alias creation:', error);
+        res.status(500).json({ response: 500, error: 'Internal Server Error' });
+    }
 });
 
-// GET endpoint to fetch all custom links for the authenticated user
-router.get('/aliases',async (req, res) => {
-  const userId = req.user.id;
+// GET route to retrieve all custom aliases for the logged-in user
+router.get('/custom-aliases', authenticateToken, async (req, res) => {
+    const userId = req.user.id;
 
-  try {
-    const result = await pool.query('SELECT original_url, short_url FROM shortened_urls WHERE user_id = $1', [userId]);
+    try {
+        // Retrieve all custom links for the user
+        const result = await pool.query(
+            'SELECT * FROM custom_links WHERE user_id = $1',
+            [userId]
+        );
 
-    const converted_custom_links = result.rows.reduce((acc, link, index) => {
-      acc[index + 1] = {
-        original_link: link.original_url,
-        converted_custom_link: `https://link-shortened.vercel.app/api/${link.short_url}`
-      };
-      return acc;
-    }, {});
+        const converted_custom_links = result.rows.map((row) => ({
+            original_link: row.original_link,
+            converted_custom_link: `https://link-shorten-two.vercel.app/api/short/${row.custom_link}`
+        }));
 
-    res.status(200).json({
-      code: 200,
-      converted_custom_links
-    });
-  } catch (error) {
-    console.error('Error fetching custom links:', error);
-    res.status(500).json({
-      response: 500,
-      error: 'Internal server error'
-    });
-  }
+        res.status(200).json({
+            code: 200,
+            converted_custom_links
+        });
+    } catch (error) {
+        console.error('Error fetching custom aliases:', error);
+        res.status(500).json({ response: 500, error: 'Internal Server Error' });
+    }
 });
 
 module.exports = router;

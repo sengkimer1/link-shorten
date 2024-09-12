@@ -10,7 +10,7 @@ if (!JWT_SECRET) {
 }
 // User signup route
 router.post('/signup', async (req, res) => {
-    const { username, email, password } = req.body;
+    const { username, email, password ,role="user"} = req.body;
     console.log('Received signup request:', { username, email });
 
     try {
@@ -20,8 +20,8 @@ router.post('/signup', async (req, res) => {
 
         console.time('Inserting user into database');
         const result = await pool.query(
-            'INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING *',
-            [username, email, hashedPassword]
+            'INSERT INTO users (username, email, password ,role) VALUES ($1, $2, $3) RETURNING *',
+            [username, email, hashedPassword,role] 
         );
         console.timeEnd('Inserting user into database');
 
@@ -31,6 +31,7 @@ router.post('/signup', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
 
 // User login route
 router.post('/login', async (req, res) => {
@@ -57,7 +58,7 @@ router.post('/login', async (req, res) => {
             return res.status(400).json({ error: 'Invalid email or password' });
         }
 
-        const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '12h' });
+        const token = jwt.sign({ id: user.id, email: user.email,role:user.role }, JWT_SECRET, { expiresIn: '12h' });
         res.json({ message: 'Logged in successfully', token });
     } catch (error) {
         console.error('Login error:', error.message);

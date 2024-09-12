@@ -18,7 +18,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
     const currentTimeInBangkok = moment().tz('Asia/Bangkok').format();
-    console.log('Current Time in Bangkok:', currentTimeInBangkok);
+    // console.log('Current Time in Bangkok:', currentTimeInBangkok);
     next();
 });
 
@@ -28,7 +28,7 @@ app.use('/api/admin', adminRouter);
 app.use('/api/short', urlRoutes);
 app.use('/api', customRoutes);
 
-const PORT = process.env.PORT || 2000;
+const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
 });
