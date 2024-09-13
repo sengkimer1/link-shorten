@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 require('dotenv').config();
-const moment = require('moment-timezone'); // Import moment-timezone
+// const moment = require('moment-timezone'); // Import moment-timezone
 
 const authRoutes = require('./routes/authRoutes');
 const landingRoutes = require('./routes/landingRoutes');
@@ -16,10 +16,10 @@ app.use(cors());
 app.use(bodyParser.json());
 // app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use((req, res, next) => {
-    const currentTimeInBangkok = moment().tz('Asia/Bangkok').format();
-    next();
-});
+// app.use((req, res, next) => {
+//     const currentTimeInBangkok = moment().tz('Asia/Bangkok').format();
+//     next();
+// });
 
 app.use('/auth', authRoutes);
 app.use('/api/shorten', landingRoutes);
