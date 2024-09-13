@@ -14,11 +14,10 @@ const app = express();
 
 app.use(cors());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+// app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
     const currentTimeInBangkok = moment().tz('Asia/Bangkok').format();
-    // console.log('Current Time in Bangkok:', currentTimeInBangkok);
     next();
 });
 
