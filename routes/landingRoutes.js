@@ -26,7 +26,7 @@ router.post('/', async (req, res) => {
 router.get('/:shortUrl', async (req, res) => {
     const { shortUrl } = req.params;
     try {
-        const result = await pool.query('SELECT id, original_url, short_url, (expires_at > NOW()) AS is_active FROM urls WHERE short_url = $1', [shortUrl]);
+        const result = await pool.query('SELECT original_url, expires_at, expires_at > NOW() AS is_active  FROM urls WHERE short_url = $1', [shortUrl]);
         if (result.rows.length > 0 && result.rows[0].is_active) {
             res.redirect(result.rows[0].original_url);
         } else {
