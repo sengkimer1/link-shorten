@@ -32,10 +32,11 @@ router.get('/:shortUrl', async (req, res) => {
              WHERE short_url = $1`, 
             [shortUrl]
         );
+        const todayDate = new Date(new Date().toLocaleDateString());
 
         if (result.rows.length > 0) {
             const { original_url, is_active,expiresAt} = result.rows[0];
-            if (expiresAt>Date.now()) {
+            if (expiresAt>todayDate) {
                 res.redirect(original_url);
             } else {
                 res.status(404).json({ code: 404, error: 'URL has expired' });
