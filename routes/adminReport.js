@@ -111,10 +111,10 @@ const getSpecificLinkReport = async (shortened_link) => {
         short_url,
         created_by,
         expires_at,
-        SUM(clicks) AS total_clicks
+        COALESCE(SUM(clicks), 0) AS total_clicks
       FROM
         shortened_urls
-      JOIN url_clicks ON shortened_urls.id = url_clicks.shortened_url_id
+      LEFT JOIN url_clicks ON shortened_urls.id = url_clicks.shortened_url_id
       WHERE short_url = $1
       GROUP BY original_url, short_url, created_by, expires_at;
     `;
@@ -122,7 +122,7 @@ const getSpecificLinkReport = async (shortened_link) => {
     const dailyClicksQuery = `
       SELECT
         date_trunc('day', click_date) AS date,
-        SUM(clicks) AS clicks
+        COALESCE(SUM(clicks), 0) AS clicks
       FROM
         url_clicks
       JOIN shortened_urls ON shortened_urls.id = url_clicks.shortened_url_id
@@ -137,16 +137,21 @@ const getSpecificLinkReport = async (shortened_link) => {
     const linkReport = linkReportResult.rows[0];
     if (!linkReport) {
       console.log('Link not found:', shortened_link);
-      throw { code: 404, message: 'Link not found' };
+      return { code: 404, message: 'Link not found' }; // Returning a 404 message instead of throwing an error
     }
 
+    // Successful response
     return {
-      ...linkReport,
-      daily_clicks: dailyClicksResult.rows
+      code: 200, // Success status code
+      data: {
+        ...linkReport,
+        daily_clicks: dailyClicksResult.rows
+      }
     };
   } catch (error) {
     console.error('Error in getSpecificLinkReport:', error);
-    throw { code: 500, message: 'Error retrieving link report data' };
+    // Returning a 500 message with error details
+    return { code: 500, message: 'Error retrieving link report data' };
   }
 };
 
