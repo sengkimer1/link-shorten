@@ -27,7 +27,7 @@ router.get('/:shortUrl', async (req, res) => {
     const { shortUrl } = req.params;
     try {
         const result = await pool.query(
-            `SELECT original_url, expires_at, expires_at > NOW() AS is_active 
+            `SELECT original_url, expires_at
              FROM urls 
              WHERE short_url = $1`, 
             [shortUrl]
