@@ -1,7 +1,8 @@
 ### Project Setup and Running
 **1.Clone the repository**
 ```bash
-git clone https://github.com/PSE-BiKay-Link-Shortener/Link-Shortener-Express.git
+git clone https://github.com/your-repo/example
+cd example
 ```
 **2.Install Dependencies**
 ```bash
@@ -9,9 +10,10 @@ npm install
 ```
 **3.Create .env File Set up environment variables in a .env file:**
 ```bash
-DATABASE_URL=postgres://wmad_students:WMAD%40%23students2023@62.72.46.248:5432/pbls
-PORT=4000
-JWT_SECRET=QjTD2unymwoyH9v3VE1bugZZ1KYEgGCU4rdFNQzPsKw///
+DATABASE_URL=postgres://username:password@localhost:5432/database
+PORT=5000
+JWT_SECRET=your_jwt_secret
+
 ```
 **4.Run Database Migrations**
 ```bash
