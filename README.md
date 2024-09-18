@@ -13,7 +13,6 @@ npm install
 DATABASE_URL=postgres://username:password@localhost:5432/database
 PORT=5000
 JWT_SECRET=your_jwt_secret
-
 ```
 **4.Run Database Migrations**
 ```bash
