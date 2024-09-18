@@ -21,7 +21,6 @@ npm run migrate
 ```bash
 npm start
 ```
-
 ### This is Landing Page
 **Method** `POST`
 **URL:** `https://link-shorten-two.vercel.app/api/shorten`
