@@ -9,7 +9,8 @@ const landingRoutes = require('./routes/landingRoutes');
 const adminRouter = require('./routes/adminRouter');
 const urlRoutes = require('./routes/urlRoutes');
 const customRoutes = require('./routes/customRoutes');
-const adminReport = require('./routes/adminReport')
+const adminReport = require('./routes/adminReport');
+const profile = require('./routes/profile');
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use('/api/admin', adminRouter);
 app.use('/api/short', urlRoutes);
 app.use('/api/custom', customRoutes);
 app.use('/api/report', adminReport);
+app.use('/api',profile);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
