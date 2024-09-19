@@ -64,16 +64,16 @@ REQUEST
 
 **This is the link ues for view all link admin.**
 **Method** `GET`
-**URL:** `https://back-link-shorter-133v.vercel.app/admin/links`
+**URL:** `https://link-shorten-two.vercel.app/admin/links`
 
 
 **This is the link ues for delete link admin.**
 **Method** `DELETE`
-**URL:** `https://back-link-shorter-133v.vercel.app/admin/links/1"`
+**URL:** `https://link-shorten-two.vercel.app/admin/links/1"`
 
 **This is the link ues up update all link admin.**
 **Method** `PUT`
-**URL:** `https://back-link-shorter-133v.vercel.app/admin/links/1`
+**URL:** `https://link-shorten-two.vercel.app/admin/links/1`
 
 ```json
 
@@ -109,12 +109,12 @@ Respon
 ### Custom Aliases API
 
 **This is the link use for get covert custom_link**
-**Method** `post`
-**URL:** `https://back-link-shorter-133v.vercel.app/api/custom-aliases`
+**Method** `GET`
+**URL:** `https://link-shorten-two.vercel.app/api/custom/custom-aliases`
 
 **This is the link use for post covert custom_link**
 **Method** `POST`
-**URL:** `https://back-link-shorter-133v.vercel.app/api/custom-aliases`
+**URL:** `https://link-shorten-two.vercel.app/api/custom/custom-aliases`
 
 
 ```json
