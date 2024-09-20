@@ -218,6 +218,32 @@ const generateShortUrl = () => crypto.randomBytes(4).toString('hex');
 // --- Reorganize Routes to Fix Route Matching Issues ---
 
 // Get list of converted links for authenticated user
+
+
+// Convert long URL to short URL for authenticated user
+router.post('/convert', authenticateToken, async (req, res) => {
+    const { link } = req.body;
+    try {
+        if (!link) {
+            return res.status(400).json({ error: 'No link provided' });
+        }
+
+        const user = req.user;
+        const expiresAt = new Date(Date.now() + 120 * 60000); // 2 hours
+        const shortUrl = generateShortUrl();
+
+        const result = await pool.query(
+            'INSERT INTO shortened_urls (user_id, original_url, short_url, expires_at) VALUES ($1, $2, $3, $4) RETURNING *',
+            [user.id, link, shortUrl, expiresAt]
+        );
+
+        const shortenedLink = `https://link-shorten-two.vercel.app/api/short/${shortUrl}`;
+        res.status(200).json({ shortened_link: shortenedLink });
+    } catch (error) {
+        console.error('Error during POST /convert:', error);
+        res.status(500).json({ error: 'Something went wrong', details: error.message });
+    }
+});
 router.get('/linked', authenticateToken, async (req, res) => {
     try {
         const userId = req.user.id;
@@ -247,32 +273,6 @@ router.get('/linked', authenticateToken, async (req, res) => {
         res.status(500).json({ response: 500, error: 'Server error' });
     }
 });
-
-// Convert long URL to short URL for authenticated user
-router.post('/convert', authenticateToken, async (req, res) => {
-    const { link } = req.body;
-    try {
-        if (!link) {
-            return res.status(400).json({ error: 'No link provided' });
-        }
-
-        const user = req.user;
-        const expiresAt = new Date(Date.now() + 120 * 60000); // 2 hours
-        const shortUrl = generateShortUrl();
-
-        const result = await pool.query(
-            'INSERT INTO shortened_urls (user_id, original_url, short_url, expires_at) VALUES ($1, $2, $3, $4) RETURNING *',
-            [user.id, link, shortUrl, expiresAt]
-        );
-
-        const shortenedLink = `https://link-shorten-two.vercel.app/api/short/${shortUrl}`;
-        res.status(200).json({ shortened_link: shortenedLink });
-    } catch (error) {
-        console.error('Error during POST /convert:', error);
-        res.status(500).json({ error: 'Something went wrong', details: error.message });
-    }
-});
-
 // Dynamic route to handle redirection using short URL (must be at the bottom)
 router.get('/:shortUrl', authenticateToken, async (req, res) => {
     try {
