@@ -1,30 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../db');
-const jwt = require('jsonwebtoken');
+const authenticateToken = require('../models/token')
 
-const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET) {
-    throw new Error('JWT_SECRET is not defined');
-}
-
-// Token authentication middleware
-const authenticateToken = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-    if (!token) {
-        return res.status(401).json({ error: 'No token provided' });
-    }
-
-    jwt.verify(token, JWT_SECRET, (err, user) => {
-        if (err) {
-            console.error('JWT Verification Error:', err.message);
-            return res.status(403).json({ error: 'Invalid token', details: err.message });
-        }
-        req.user = user;
-        next();
-    });
-};
 
 // POST route to create a custom alias
 router.post('/custom-aliases', authenticateToken, async (req, res) => {

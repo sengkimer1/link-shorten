@@ -178,40 +178,10 @@
 
 const express = require('express');
 const router = express.Router();
-const jwt = require('jsonwebtoken');
 const pool = require('../db');
 const crypto = require('crypto');
+const authenticateToken = require('../models/token')
 
-const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET) {
-    throw new Error('JWT_SECRET is not defined');
-}
-
-const authenticateToken = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-
-    // Check if the authorization header is present and starts with "Bearer "
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ error: 'Authorization header must start with "Bearer "' });
-    }
-
-    // Extract the token after "Bearer "
-    const token = authHeader.split(' ')[1];
-
-    // Verify the token
-    jwt.verify(token, JWT_SECRET, (err, user) => {
-        if (err) {
-            console.error('JWT Verification Error:', err.message);
-            return res.status(403).json({ error: 'Invalid token', details: err.message });
-        }
-
-        // Store user information in the request object for further use
-        req.user = user;
-        
-        // Proceed to the next middleware
-        next();
-    });
-};
 
 const generateShortUrl = () => crypto.randomBytes(4).toString('hex');
 
@@ -229,7 +199,7 @@ router.post('/convert', authenticateToken, async (req, res) => {
         }
 
         const user = req.user;
-        const expiresAt = new Date(Date.now() + 120 * 60000); // 2 hours
+        const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 1 week
         const shortUrl = generateShortUrl();
 
         const result = await pool.query(
