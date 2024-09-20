@@ -159,33 +159,11 @@ REQUEST
 ```json
 REQUEST
 {
-    "code": 200,
-    "report": {
-        "total_conversions": "0",
-        "active_users": "0",
-        "top_links": [
-            {
-                "original_url": "https://www.new-url.com/",
-                "short_url": "newshorturl",
-                "total_clicks": "1"
-            }
-        ],
-        "user_activity": [
-            {
-                "user_id": null,
-                "conversions": "1",
-                "total_clicks": "1"
-            }
-        ],
-        "daily_stats": [
-            {
-                "date": "2024-09-16T00:00:00.000Z",
-                "conversions": "1",
-                "total_clicks": "1"
-            }
-        ]
-    }
+  "start_date": "2024-01-01",
+  "end_date": "2024-01-31",
+  "user_id": "12345" // Optional
 }
+
 
 ```
 **This is the link use for post link report**
@@ -194,17 +172,7 @@ REQUEST
 ```json
 REQUEST
 {
-    "code": 200,
-    "link_report": {
-        "code": 200,
-        "data": {
-            "original_url": "https://www.google.com/",
-            "short_url": "3eafe3f2",
-            "created_by": null,
-            "expires_at": "2024-09-16T05:44:20.920Z",
-            "total_clicks": "0",
-            "daily_clicks": []
-        }
-    }
+  "shortened_link": "abc123"
 }
+
 ```

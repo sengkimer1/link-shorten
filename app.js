@@ -27,7 +27,7 @@ app.use('/api/shorten', landingRoutes);
 app.use('/api/admin', adminRouter);
 app.use('/api/short', urlRoutes);
 app.use('/api/custom', customRoutes);
-app.use('/api/report', adminReport);
+app.use('/api/admin', adminReport);
 app.use('/api',profile);
 
 const PORT = process.env.PORT || 4000;

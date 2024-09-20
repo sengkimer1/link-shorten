@@ -233,9 +233,10 @@ router.post('/convert', authenticateToken, async (req, res) => {
         const shortUrl = generateShortUrl();
 
         const result = await pool.query(
-            'INSERT INTO shortened_urls (user_id, original_url, short_url, expires_at) VALUES ($1, $2, $3, $4) RETURNING *',
-            [user.id, link, shortUrl, expiresAt]
+            'INSERT INTO shortened_urls (user_id, original_url, short_url, expires_at, created_by) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+            [user.id, link, shortUrl, expiresAt, user.id] // Assuming created_by is user.id
         );
+        
 
         const shortenedLink = `https://link-shorten-two.vercel.app/api/short/${shortUrl}`;
         res.status(200).json({ shortened_link: shortenedLink });
