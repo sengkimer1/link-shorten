@@ -64,16 +64,19 @@ REQUEST
 
 **This is the link ues for view all link admin.**
 **Method** `GET`
-**URL:** `https://link-shorten-two.vercel.app/admin/links`
+**URL:** `https://link-shorten-two.vercel.app/api/links`
 
+**This is the link ues for view information from short link admin.**
+**Method** `GET`
+**URL:** `https://link-shorten-two.vercel.app/api/links/view/:shortUrl`
 
 **This is the link ues for delete link admin.**
 **Method** `DELETE`
-**URL:** `https://link-shorten-two.vercel.app/admin/links/1"`
+**URL:** `https://link-shorten-two.vercel.app/api/links/1"`
 
 **This is the link ues up update all link admin.**
 **Method** `PUT`
-**URL:** `https://link-shorten-two.vercel.app/admin/links/1`
+**URL:** `https://link-shorten-two.vercel.app/api/links/1`
 
 ```json
 
@@ -155,7 +158,7 @@ REQUEST
 ### Admin Report
 **This is the link use for post report**
 **Method** `POST`
-**URL:** `https://link-shorten-two.vercel.app/api/report/report`
+**URL:** `https://link-shorten-two.vercel.app/api/admin/report`
 ```json
 REQUEST
 {
@@ -168,7 +171,7 @@ REQUEST
 ```
 **This is the link use for post link report**
 **Method** `POST`
-**URL:** `https://link-shorten-two.vercel.app/api/report/link-report`
+**URL:** `https://link-shorten-two.vercel.app/api/admin/link-report`
 ```json
 REQUEST
 {
