@@ -47,13 +47,14 @@ const getAdminReport = async (start_date = '2021-01-01', end_date = '2025-12-31'
       ORDER BY total_clicks DESC
       LIMIT 10;
     `, [start_date, end_date]);
-
     const userActivity = await executeQuery(`
-      SELECT created_by AS user_id, COUNT(*) AS conversions, COALESCE(SUM(clicks), 0) AS total_clicks
+      SELECT users.id AS user_id, users.username, users.email, COUNT(shortened_urls.id) AS conversions, COALESCE(SUM(url_clicks.clicks), 0) AS total_clicks
       FROM shortened_urls
       LEFT JOIN url_clicks ON shortened_urls.id = url_clicks.shortened_url_id
-      WHERE expires_at BETWEEN $1 AND $2
-      GROUP BY created_by;
+      JOIN users ON shortened_urls.created_by = users.id
+      WHERE shortened_urls.expires_at BETWEEN $1 AND $2
+      GROUP BY users.id, users.username, users.email
+      ORDER BY total_clicks DESC;
     `, [start_date, end_date]);
 
     const dailyStats = await executeQuery(`
