@@ -245,7 +245,7 @@ router.get('/linked', authenticateToken, async (req, res) => {
     }
 });
 // Dynamic route to handle redirection using short URL (must be at the bottom)
-router.get('/:shortUrl', authenticateToken, async (req, res) => {
+router.get('/:shortUrl', async (req, res) => {
     try {
         const { shortUrl } = req.params;
         const userId = req.user.id; 
