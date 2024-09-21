@@ -185,11 +185,6 @@ const authenticateToken = require('../models/token')
 
 const generateShortUrl = () => crypto.randomBytes(4).toString('hex');
 
-// --- Reorganize Routes to Fix Route Matching Issues ---
-
-// Get list of converted links for authenticated user
-
-
 // Convert long URL to short URL for authenticated user
 router.post('/convert', authenticateToken, async (req, res) => {
     const { link } = req.body;
@@ -248,25 +243,31 @@ router.get('/linked', authenticateToken, async (req, res) => {
 router.get('/:shortUrl', async (req, res) => {
     try {
         const { shortUrl } = req.params;
-        const userId = req.user.id; 
 
         const result = await pool.query(
-            'SELECT original_url FROM shortened_urls WHERE short_url = $1 AND user_id = $2',
-            [shortUrl, userId]
+            'SELECT original_url, expires_at FROM shortened_urls WHERE short_url = $1',
+            [shortUrl]
         );
-
+        
         if (result.rows.length > 0) {
-            // Redirect to the original URL
-            res.redirect(result.rows[0].original_url);
+            const { original_url, expires_at } = result.rows[0];
+            const expiresAtUTC = new Date(expires_at).getTime();
+            const nowUTC = Date.now(); // This is also UTC
+
+            if (expiresAtUTC > nowUTC) {
+                res.redirect(original_url);
+            } else {
+                res.status(404).json({ code: 404, error: 'URL has expired' });
+            }
         } else {
-            // No URL found for the user
-            res.status(404).json({ error: 'Link not found for this user' });
+            res.status(404).json({ code: 404, error: 'URL not found' });
         }
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Server error' });
     }
 });
+
 
 // Dynamic route to check expiration date of a short URL
 router.get('/:shortUrl/expires', async (req, res) => {
