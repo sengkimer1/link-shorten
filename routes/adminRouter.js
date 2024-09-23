@@ -6,11 +6,11 @@ const authenticateToken = require('../models/token');
 // Admin: Get all links
 router.get('/links', authenticateToken, async (req, res) => {
   try {
-    const result = await pool.query(
-      `SELECT u.id AS , u.username, l.original_url, l.short_url
-       FROM users u
-       JOIN shortened_urls l ON u.id = l.created_by`
-    );
+    const result = await pool.query(`
+      SELECT u.id AS user_id, u.username, l.original_url, l.short_url, l.click_count
+      FROM users u
+      JOIN shortened_urls l ON u.id = l.created_by
+    `);
 
     const users = {};
 
@@ -18,10 +18,14 @@ router.get('/links', authenticateToken, async (req, res) => {
       if (!users[`user_${row.user_id}`]) {
         users[`user_${row.user_id}`] = {
           username: row.username,
-          list_of_converted_links: {}
+          list_of_converted_links: []
         };
       }
-      users[`user_${row.user_id}`].list_of_converted_links[row.original_url] = row.short_url;
+      users[`user_${row.user_id}`].list_of_converted_links.push({
+        original_url: row.original_url,
+        short_url: row.short_url,
+        click_count: row.click_count
+      });
     });
 
     res.status(200).json({ code: 200, users });
@@ -30,6 +34,8 @@ router.get('/links', authenticateToken, async (req, res) => {
     res.status(500).json({ response: 500, error: 'Something went wrong' });
   }
 });
+
+
 
 router.get('/link_all', authenticateToken, async (req, res) => {
   try {
