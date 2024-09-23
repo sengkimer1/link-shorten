@@ -62,59 +62,46 @@ REQUEST
 
 ### Admin DASDBOARD
 
-**This is the link ues for view all link admin.**
+**This is the link ues for view all link from user idadmin.**
+
 **Method** `GET`
+
 **URL:** `https://link-shorten-two.vercel.app/api/links`
 
 
+**This is the link ues for view all link  idadmin.**
+
+**Method** `GET`
+
+**URL:** `https://link-shorten-two.vercel.app/api/link_all`
 
 **This is the link ues for view information from short link admin.**
+
 **Method** `GET`
+
 **URL:** `https://link-shorten-two.vercel.app/api/links/view/:shortUrl`
 
 **This is the link ues for delete link admin.**
+
 **Method** `DELETE`
+
 **URL:** `https://link-shorten-two.vercel.app/api/links/1"`
 
 **This is the link ues up update all link admin.**
+
 **Method** `PUT`
+
 **URL:** `https://link-shorten-two.vercel.app/api/links/1`
 
-```json
 
-Take it to test in Postman
-{
-"username": "Jonh",
-"password": "Jonh123"
-}
-
-Respon
-{
-      "code": 200,
-    "users": {
-        "user_1": {
-            "username": "Jonh",
-            "list_of_converted_links": {
-                "https://www.youtube.com/watch?v=XwPDxTBIRSc&list=RDXwPDxTBIRSc&start_radio=1": "i4agj",
-                "https://www.youtube.com/watch?v=YMvrk9sH0u4": "t4s87",
-            }
-        },
-        "user_2": {
-            "username": "Jack",
-            "list_of_converted_links": {
-                "https://www.youtube.com/watch?v=XwPDxTBIRSc&list=RDXwPDxTBIRSc&start_radio=1": "https://short.ly/0g9w8",
-                "https://www.youtube.com/watch?v=BjdLmwFp9kE&list=RDXwPDxTBIRSc&index=5": "https://short.ly/khwdh"
-            }
-        },
-    }
-}
-```
 
 
 ### Custom Aliases API
 
 **This is the link use for get covert custom_link**
+
 **Method** `GET`
+
 **URL:** `https://link-shorten-two.vercel.app/api/custom/custom-aliases`
 
 **This is the link use for post covert custom_link**
@@ -151,7 +138,9 @@ Respon
 ### URL SHORTEN API
 
 **This is the link use for shorten api**
-**Method** `POSt`
+
+**Method** `POST`
+
 **URL:** `https://link-shorten-two.vercel.app/api/shorten`
 ```json
 REQUEST
@@ -160,8 +149,11 @@ REQUEST
 }
 ```
 ### Admin Report
+
 **This is the link use for post report**
+
 **Method** `POST`
+
 **URL:** `https://link-shorten-two.vercel.app/api/admin/report`
 ```json
 REQUEST
@@ -173,7 +165,9 @@ REQUEST
 
 ```
 **This is the link use for post link report**
+
 **Method** `POST`
+
 **URL:** `https://link-shorten-two.vercel.app/api/admin/link-report`
 ```json
 REQUEST
