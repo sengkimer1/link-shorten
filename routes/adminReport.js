@@ -39,31 +39,54 @@ const getAdminReport = async (start_date = '2021-01-01', end_date = '2025-12-31'
     }
 
     const topLinks = await executeQuery(`
-      SELECT original_url, short_url, SUM(clicks) AS total_clicks
-      FROM url_clicks
-      JOIN shortened_urls ON url_clicks.shortened_url_id = shortened_urls.id
-      WHERE click_date BETWEEN $1 AND $2
-      GROUP BY original_url, short_url
-      ORDER BY total_clicks DESC
-      LIMIT 10;
+   SELECT 
+    original_url, 
+    short_url, 
+    click_count
+FROM 
+    shortened_urls
+WHERE 
+    expires_at BETWEEN $1 AND $2
+ORDER BY 
+    click_count DESC
+LIMIT 5;
+
+
     `, [start_date, end_date]);
     const userActivity = await executeQuery(`
-      SELECT users.id AS user_id, users.username, users.email, COUNT(shortened_urls.id) AS conversions, COALESCE(SUM(url_clicks.clicks), 0) AS total_clicks
-      FROM shortened_urls
-      LEFT JOIN url_clicks ON shortened_urls.id = url_clicks.shortened_url_id
-      JOIN users ON shortened_urls.created_by = users.id
-      WHERE shortened_urls.expires_at BETWEEN $1 AND $2
-      GROUP BY users.id, users.username, users.email
-      ORDER BY total_clicks DESC;
+      SELECT 
+    users.id AS user_id, 
+    users.username, 
+    users.email, 
+    COUNT(shortened_urls.id) AS conversions, 
+    COALESCE(SUM(shortened_urls.click_count), 0) AS total_clicks
+FROM 
+    shortened_urls
+JOIN 
+    users ON shortened_urls.created_by = users.id
+WHERE 
+    shortened_urls.expires_at BETWEEN $1 AND $2
+GROUP BY 
+    users.id, users.username, users.email
+ORDER BY 
+    total_clicks DESC;
+
     `, [start_date, end_date]);
 
     const dailyStats = await executeQuery(`
-      SELECT date_trunc('day', click_date) AS date, COUNT(*) AS conversions, COALESCE(SUM(clicks), 0) AS clicks
-      FROM shortened_urls
-      LEFT JOIN url_clicks ON shortened_urls.id = url_clicks.shortened_url_id
-      WHERE click_date BETWEEN $1 AND $2
-      GROUP BY date
-      ORDER BY date ASC;
+     SELECT 
+    date_trunc('day', shortened_urls.expires_at) AS date, 
+    COUNT(*) AS conversions, 
+    COALESCE(SUM(click_count), 0) AS clicks
+FROM 
+    shortened_urls
+WHERE 
+    expires_at BETWEEN $1 AND $2
+GROUP BY 
+    date
+ORDER BY 
+    date ASC;
+
     `, [start_date, end_date]);
 
     return {
@@ -127,18 +150,19 @@ router.post('/link-report', authenticateToken, async (req, res) => {
   }
 });
 
-// Total conversions and active users route
-router.get('/total-convert', authenticateToken, async (req, res) => {
-  try {
-    const [result] = await executeQuery(`
-      SELECT COUNT(*) AS total_conversions, COUNT(DISTINCT created_by) AS active_users
-      FROM shortened_urls;
-    `);
-    res.status(200).json({ code: 200, total_conversions: result.total_conversions, active_users: result.active_users });
-  } catch (error) {
-    res.status(500).json({ error: 'Error retrieving total conversions and active users' });
-  }
-});
+// // Total conversions and active users route
+// router.get('/total-convert', authenticateToken, async (req, res) => {
+//   try {
+//     const [result] = await executeQuery(`
+//       SELECT COUNT(*) AS total_conversions, COUNT(DISTINCT created_by) AS active_users
+//       FROM shortened_urls;
+//     `);
+//     res.status(200).json({ code: 200, total_conversions: result.total_conversions, active_users: result.active_users });
+//   } catch (error) {
+//     res.status(500).json({ error: 'Error retrieving total conversions and active users' });
+//   }
+// });
+
 
 // Export the router
 module.exports = router;

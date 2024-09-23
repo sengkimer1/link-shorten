@@ -88,18 +88,68 @@ router.get('/links/view/:shortUrl', authenticateToken, async (req, res) => {
     const urlData = result.rows[0];
 
     // Increment the click count
-    await pool.query('UPDATE shortened_urls SET click_count = click_count + 1 WHERE short_url = $1', [shortUrl]);
+    // await pool.query('UPDATE shortened_urls SET click_count = click_count + 1 WHERE short_url = $1', [shortUrl]);
 
     return res.json({
       id: urlData.id,
       shortUrl: urlData.short_url,
       originalUrl: urlData.original_url,
-      startDate: urlData.created_by,  // Corrected field name for creation date
+      startDate: urlData.created_by,  
       expiryDate: urlData.expires_at,
-      clickCount: urlData.click_count + 1  // Incremented click count in response
+      clickCoun:urlData.click_count
     });
   } catch (error) {
     console.error('Error fetching URL information:', error);
+    return res.status(500).json({ error: 'Server error' });
+  }
+});
+
+//end point for click count
+// router.post("/count",authenticateToken,async(req,res) =>{
+
+//   const {shortUrl} = req.params;
+//   try {
+//     const result = await pool.query('UPDATE shortened_urls SET click_count = click_count + 1 WHERE short_url = $1', [shortUrl])}
+
+//   // req.user if (!req.user) return unauhorize
+
+//   // find data in table shortenUrl by req.user._id and shortenUrl
+
+//   //update click count => clickCout + 1;
+
+
+// })
+router.post("/count/:shortUrl", authenticateToken, async (req, res) => {
+  const { shortUrl } = req.params; 
+
+  if (!req.user) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    // Update the click count
+    await pool.query(
+      'UPDATE shortened_urls SET click_count = click_count + 1 WHERE short_url = $1',
+      [shortUrl]
+    );
+
+    // Fetch the updated click count
+    const result = await pool.query(
+      'SELECT click_count FROM shortened_urls WHERE short_url = $1',
+      [shortUrl]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'URL not found' });
+    }
+
+    return res.json({
+      message: 'Click count updated',
+      clickCount: result.rows[0].click_count
+    });
+
+  } catch (error) {
+    console.error('Error updating click count:', error);
     return res.status(500).json({ error: 'Server error' });
   }
 });
