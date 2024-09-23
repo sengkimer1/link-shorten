@@ -41,7 +41,8 @@ router.get('/link_all', authenticateToken, async (req, res) => {
   try {
     const result= await pool.query(
       `SELECT l.short_url, l.click_count
-       FROM shortened_urls l`
+       FROM shortened_urls l
+       order by l.id DESC`
     );
 
     const links = result.rows.map(row => ({
