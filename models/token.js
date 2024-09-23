@@ -14,11 +14,10 @@ const authenticateToken = (req, res, next) => {
   
   jwt.verify(token, JWT_SECRET, (err, user) => {
     if (err) {
-      console.error('JWT Verification Error:', err.message); // Consider a logging library for better management
-      return res.status(403).json({ error: 'Invalid token' }); // Avoid exposing details
+      return res.status(403).json({ error: 'Invalid token' }); 
     }
     
-    req.user = user; // Attach user info to the request
+    req.user = user; 
     next();
   });
 };

@@ -8,14 +8,10 @@ const authenticateToken = require('../models/token')
 router.post('/custom-aliases', authenticateToken, async (req, res) => {
     const { original_link, custom_link } = req.body;
     const userId = req.user.id;
-
-    // Check for missing fields
     if (!original_link || !custom_link) {
         return res.status(400).json({ error: 'Original link and custom link are required' });
     }
-
     try {
-        // Check if the custom link already exists for the user
         const result = await pool.query(
             'SELECT * FROM custom_links WHERE custom_link = $1 AND user_id = $2',
             [custom_link, userId]
@@ -24,8 +20,6 @@ router.post('/custom-aliases', authenticateToken, async (req, res) => {
         if (result.rows.length > 0) {
             return res.status(400).json({ error: 'Custom link already exists' });
         }
-
-        // Insert new custom link
         await pool.query(
             'INSERT INTO public.custom_links(user_id, original_link, custom_link) VALUES ($1, $2, $3)',
             [userId, original_link, custom_link]
@@ -39,7 +33,6 @@ router.post('/custom-aliases', authenticateToken, async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Error during custom alias creation:', error);
         res.status(500).json({ response: 500, error: 'Internal Server Error' });
     }
 });
@@ -49,7 +42,6 @@ router.get('/custom-aliases', authenticateToken, async (req, res) => {
     const userId = req.user.id;
 
     try {
-        // Retrieve all custom links for the user
         const result = await pool.query(
             'SELECT * FROM custom_links WHERE user_id = $1',
             [userId]
@@ -65,7 +57,6 @@ router.get('/custom-aliases', authenticateToken, async (req, res) => {
             converted_custom_links
         });
     } catch (error) {
-        console.error('Error fetching custom aliases:', error);
         res.status(500).json({ response: 500, error: 'Internal Server Error' });
     }
 });
@@ -75,7 +66,6 @@ router.get('/:customLink', async (req, res) => {
     const { customLink } = req.params;
 
     try {
-        // Find the original link associated with the custom link
         const result = await pool.query(
             'SELECT original_link FROM custom_links WHERE custom_link = $1',
             [customLink]
@@ -86,11 +76,8 @@ router.get('/:customLink', async (req, res) => {
         }
 
         const originalLink = result.rows[0].original_link;
-
-        // Redirect to the original link
         res.redirect(originalLink);
     } catch (error) {
-        console.error('Error during redirection:', error);
         res.status(500).json({ response: 500, error: 'Internal Server Error' });
     }
 });

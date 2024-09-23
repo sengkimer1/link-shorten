@@ -20,7 +20,6 @@ router.get('/profile', authenticateToken, async (req, res) => {
         const { username, email } = result.rows[0];
         res.status(200).json({ username, email });
     } catch (error) {
-        console.error('Error fetching user profile:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 });

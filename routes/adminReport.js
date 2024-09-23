@@ -43,13 +43,13 @@ const getAdminReport = async (start_date = '2021-01-01', end_date = '2025-12-31'
     original_url, 
     short_url, 
     click_count
-FROM 
+    FROM 
     shortened_urls
-WHERE 
+    WHERE 
     expires_at BETWEEN $1 AND $2
-ORDER BY 
+    ORDER BY 
     click_count DESC
-LIMIT 5;
+    LIMIT 5;
 
 
     `, [start_date, end_date]);
@@ -60,15 +60,15 @@ LIMIT 5;
     users.email, 
     COUNT(shortened_urls.id) AS conversions, 
     COALESCE(SUM(shortened_urls.click_count), 0) AS total_clicks
-FROM 
+    FROM 
     shortened_urls
-JOIN 
+    JOIN 
     users ON shortened_urls.created_by = users.id
-WHERE 
+    WHERE 
     shortened_urls.expires_at BETWEEN $1 AND $2
-GROUP BY 
+    GROUP BY 
     users.id, users.username, users.email
-ORDER BY 
+    ORDER BY 
     total_clicks DESC;
 
     `, [start_date, end_date]);
@@ -78,13 +78,13 @@ ORDER BY
     date_trunc('day', shortened_urls.expires_at) AS date, 
     COUNT(*) AS conversions, 
     COALESCE(SUM(click_count), 0) AS clicks
-FROM 
+    FROM 
     shortened_urls
-WHERE 
+    WHERE 
     expires_at BETWEEN $1 AND $2
-GROUP BY 
+    GROUP BY 
     date
-ORDER BY 
+    ORDER BY 
     date ASC;
 
     `, [start_date, end_date]);
@@ -150,19 +150,4 @@ router.post('/link-report', authenticateToken, async (req, res) => {
   }
 });
 
-// // Total conversions and active users route
-// router.get('/total-convert', authenticateToken, async (req, res) => {
-//   try {
-//     const [result] = await executeQuery(`
-//       SELECT COUNT(*) AS total_conversions, COUNT(DISTINCT created_by) AS active_users
-//       FROM shortened_urls;
-//     `);
-//     res.status(200).json({ code: 200, total_conversions: result.total_conversions, active_users: result.active_users });
-//   } catch (error) {
-//     res.status(500).json({ error: 'Error retrieving total conversions and active users' });
-//   }
-// });
-
-
-// Export the router
 module.exports = router;

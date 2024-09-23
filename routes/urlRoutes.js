@@ -182,7 +182,6 @@ const pool = require('../db');
 const crypto = require('crypto');
 const authenticateToken = require('../models/token')
 
-
 const generateShortUrl = () => crypto.randomBytes(4).toString('hex');
 
 // Convert long URL to short URL for authenticated user
@@ -199,14 +198,13 @@ router.post('/convert', authenticateToken, async (req, res) => {
 
         const result = await pool.query(
             'INSERT INTO shortened_urls (user_id, original_url, short_url, expires_at, created_by) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-            [user.id, link, shortUrl, expiresAt, user.id] // Assuming created_by is user.id
+            [user.id, link, shortUrl, expiresAt, user.id] 
         );
         
 
         const shortenedLink = `https://link-shorten-two.vercel.app/api/short/${shortUrl}`;
         res.status(200).json({ shortened_link: shortenedLink });
     } catch (error) {
-        console.error('Error during POST /convert:', error);
         res.status(500).json({ error: 'Something went wrong', details: error.message });
     }
 });
@@ -235,7 +233,6 @@ router.get('/linked', authenticateToken, async (req, res) => {
             });
         }
     } catch (error) {
-        console.error(error);
         res.status(500).json({ response: 500, error: 'Server error' });
     }
 });
@@ -263,7 +260,6 @@ router.get('/:shortUrl', async (req, res) => {
             res.status(404).json({ code: 404, error: 'URL not found' });
         }
     } catch (error) {
-        console.error(error);
         res.status(500).json({ error: 'Server error' });
     }
 });
@@ -287,7 +283,6 @@ router.get('/:shortUrl/expires', async (req, res) => {
             res.status(404).json({ code: 404, error: 'URL not found' });
         }
     } catch (error) {
-        console.error("Error during GET /api/shorten/expires:", error.stack);
         res.status(500).json({ code: 500, error: 'Internal Server Error' });
     }
 });

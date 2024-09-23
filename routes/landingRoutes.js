@@ -12,17 +12,16 @@ router.post('/', async (req, res) => {
         const shortUrl = crypto.randomBytes(4).toString('hex');
         const expiresAt = new Date(Date.now() + 120 * 60000);
         const result = await pool.query('INSERT INTO urls (original_url, short_url, expires_at) VALUES ($1, $2, $3) RETURNING *', [link, shortUrl, expiresAt]);
-        console.log("Inserted URL:", result.rows[0]);
         res.status(200).json({
             code: 200,
             shortened_link: `https://link-shorten-two.vercel.app/api/shorten/${shortUrl}`,
             lifespan: 60,
         });
     } catch (error) {
-        console.error("Error during POST /api/shorten:", error.stack);
         res.status(500).json({ code: 500, error: 'Internal Server Error' });
     }
 });
+//Get for redirect
 router.get('/:shortUrl', async (req, res) => {
     const { shortUrl } = req.params;
     try {
@@ -36,7 +35,7 @@ router.get('/:shortUrl', async (req, res) => {
         if (result.rows.length > 0) {
             const { original_url,  expires_at } = result.rows[0];
             const expiresAtUTC = new Date(expires_at).getTime();
-            const nowUTC = Date.now(); // This is also UTC
+            const nowUTC = Date.now(); 
 
             if (expiresAtUTC > nowUTC) {
                 res.redirect(original_url);
@@ -47,12 +46,11 @@ router.get('/:shortUrl', async (req, res) => {
             res.status(404).json({ code: 404, error: 'URL not found' });
         }
     } catch (error) {
-        console.error("Error during GET /:shortUrl:", error.stack);
         res.status(500).json({ code: 500, error: 'Internal Server Error' });
     }
 });
 
-
+//Get for put short url expires
 router.get('/:shortUrl/expires', async (req, res) => {
     const { shortUrl } = req.params;
     try {
@@ -70,7 +68,6 @@ router.get('/:shortUrl/expires', async (req, res) => {
             res.status(404).json({ code: 404, error: 'URL not found' });
         }
     } catch (error) {
-        console.error("Error during GET /api/shorten/expires:", error.stack);
         res.status(500).json({ code: 500, error: 'Internal Server Error' });
     }
 });
