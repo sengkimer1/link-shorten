@@ -60,11 +60,13 @@ REQUEST
 **URL:**`https://link-shorten-two.vercel.app/api/shorten/:shortUrl/expires`
 
 
-### Admin CRUD API
+### Admin DASDBOARD
 
 **This is the link ues for view all link admin.**
 **Method** `GET`
 **URL:** `https://link-shorten-two.vercel.app/api/links`
+
+
 
 **This is the link ues for view information from short link admin.**
 **Method** `GET`
@@ -116,7 +118,9 @@ Respon
 **URL:** `https://link-shorten-two.vercel.app/api/custom/custom-aliases`
 
 **This is the link use for post covert custom_link**
+
 **Method** `POST`
+
 **URL:** `https://link-shorten-two.vercel.app/api/custom/custom-aliases`
 
 
@@ -164,7 +168,6 @@ REQUEST
 {
   "start_date": "2024-01-01",
   "end_date": "2024-01-31",
-  "user_id": "12345" // Optional
 }
 
 
