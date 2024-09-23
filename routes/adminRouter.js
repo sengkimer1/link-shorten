@@ -7,7 +7,7 @@ const authenticateToken = require('../models/token');
 router.get('/links', authenticateToken, async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT u.id AS user_id, u.username, l.original_url, l.short_url
+      `SELECT u.id AS , u.username, l.original_url, l.short_url
        FROM users u
        JOIN shortened_urls l ON u.id = l.created_by`
     );
@@ -30,6 +30,50 @@ router.get('/links', authenticateToken, async (req, res) => {
     res.status(500).json({ response: 500, error: 'Something went wrong' });
   }
 });
+
+router.get('/link_all', authenticateToken, async (req, res) => {
+  try {
+    const result= await pool.query(
+      `SELECT l.short_url, l.click_count
+       FROM shortened_urls l`
+    );
+
+    const links = result.rows.map(row => ({
+      short_url: row.short_url,
+      click_count: row.click_count
+    }));
+
+    res.status(200).json({ code: 200, links });
+  } catch (error) {
+    console.error('Admin links error:', error.message);
+    res.status(500).json({ response: 500, error: 'Something went wrong' });
+  }
+});
+
+router.get('/link_all/:id', authenticateToken, async (req, res) => {
+  const { id } = req.params; // Extract the ID from the route parameters
+  try {
+    const result = await pool.query(
+      `SELECT l.short_url, l.click_count
+       FROM shortened_urls l
+       WHERE l.id = $1`, // Filter by the user ID
+      [id] // Pass the ID as a parameter
+    );
+
+    const links = result.rows.map(row => ({
+      short_url: row.short_url,
+      click_count: row.click_count
+    }));
+
+    res.status(200).json({ code: 200, links });
+  } catch (error) {
+    console.error('Admin links error:', error.message);
+    res.status(500).json({ response: 500, error: 'Something went wrong' });
+  }
+});
+
+
+
 
 // Delete a specific link (admin only)
 router.delete('/links/:id', authenticateToken, async (req, res) => {
