@@ -22,9 +22,12 @@ npm run migrate
 ```bash
 npm start
 ```
-### This is Landing Page
+# This is Landing Page
+
 **Method** `POST`
+
 **URL:** `https://link-shorten-two.vercel.app/api/shorten`
+
 ```json
 REQUEST
 {
@@ -32,9 +35,12 @@ REQUEST
 }
 ```
 
-### This is login page
+# This is login page
+
 **Method** `POST`
+
 **URL:** `https://link-shorten-two.vercel.app/auth/login"`
+
 ```json
 REQUEST
 {
@@ -43,9 +49,12 @@ REQUEST
 }
 ```
 
-### This is signup page
+# This is signup page
+
 **Method** `POST`
+
 **URL:** `https://link-shorten-two.vercel.app/auth/signup`
+
 ```json
 REQUEST
 {
@@ -60,22 +69,37 @@ REQUEST
 **URL:**`https://link-shorten-two.vercel.app/api/shorten/:shortUrl/expires`
 
 
-### Admin DASDBOARD
+# Admin DASDBOARD 
 
-**This is the link ues for view all link from user idadmin.**
+### Need token admin
+
+**This is the link ues for view all link from user id admin.**
 
 **Method** `GET`
 
 **URL:** `https://link-shorten-two.vercel.app/api/links`
 
 
-**This is the link ues for view all link  idadmin.**
+**This is the link ues for view all link admin.**
 
 **Method** `GET`
 
 **URL:** `https://link-shorten-two.vercel.app/api/link_all`
 
 **This is the link ues for view information from short link admin.**
+
+**This is link for count click.**
+ 
+ **Method:** `POST`
+
+ **URL:**`https://link-shorten-two.vercel.app/api/count/:shortUrl`
+
+```json
+EXAMPLE:
+https://link-shorten-two.vercel.app/api/count/60acfe58
+
+```
+ 
 
 **Method** `GET`
 
@@ -96,7 +120,9 @@ REQUEST
 
 
 
-### Custom Aliases API
+# Custom Aliases API
+ 
+### Need token admin
 
 **This is the link use for get covert custom_link**
 
@@ -135,7 +161,9 @@ Respon
 }
 ```
 
-### URL SHORTEN API
+# URL SHORTEN API
+
+### Need token user
 
 **This is the link use for shorten api**
 
