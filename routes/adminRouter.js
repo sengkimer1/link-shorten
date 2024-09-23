@@ -70,35 +70,36 @@ router.get('/link_all/:id', authenticateToken, async (req, res) => {
   }
 });
 // Admin: Delete a specific link (admin only)
-router.delete('/links/:id', authenticateToken, async (req, res) => {
-  const { id } = req.params;
+router.delete('/links/:short_url', authenticateToken, async (req, res) => {
+  const { short_url } = req.params;
   try {
-    const linkCheck = await pool.query('SELECT * FROM shortened_urls WHERE id = $1', [id]);
+    const linkCheck = await pool.query('SELECT * FROM shortened_urls WHERE short_url = $1', [short_url]);
     if (linkCheck.rows.length === 0) {
       return res.status(404).json({ code: 404, error: 'Link not found' });
     }
 
-    await pool.query('DELETE FROM shortened_urls WHERE id = $1', [id]);
+    await pool.query('DELETE FROM shortened_urls WHERE short_url = $1', [short_url]);
     res.status(200).json({ code: 200, message: 'Link deleted successfully' });
   } catch (error) {
     res.status(500).json({ code: 500, error: 'Something went wrong' });
   }
 });
 
+
 //Admin: Update a specific link (admin only)
-router.put('/links/:id', authenticateToken, async (req, res) => {
-  const { id } = req.params;
-  const { original_url, short_url } = req.body;
+router.put('/links/:short_url', authenticateToken, async (req, res) => {
+  const { short_url } = req.params;
+  const { original_url, new_short_url } = req.body;
 
   try {
-    const linkCheck = await pool.query('SELECT * FROM shortened_urls WHERE id = $1', [id]);
+    const linkCheck = await pool.query('SELECT * FROM shortened_urls WHERE short_url = $1', [short_url]);
     if (linkCheck.rows.length === 0) {
       return res.status(404).json({ code: 404, error: 'Link not found' });
     }
 
     await pool.query(
-      'UPDATE shortened_urls SET original_url = $1, short_url = $2 WHERE id = $3',
-      [original_url, short_url, id]
+      'UPDATE shortened_urls SET original_url = $1, short_url = $2 WHERE short_url = $3',
+      [original_url, new_short_url || short_url, short_url]
     );
 
     res.status(200).json({ code: 200, message: 'Link updated successfully' });
@@ -106,6 +107,7 @@ router.put('/links/:id', authenticateToken, async (req, res) => {
     res.status(500).json({ code: 500, error: 'Something went wrong' });
   }
 });
+
 //Admin: view information by short url 
 router.get('/links/view/:shortUrl', authenticateToken, async (req, res) => {
   const { shortUrl } = req.params;

@@ -70,7 +70,6 @@ REQUEST
 
 
 # Admin DASDBOARD 
-
 ### Need token admin
 
 **This is the link ues for view all link from user id admin.**
@@ -109,15 +108,29 @@ https://link-shorten-two.vercel.app/api/count/60acfe58
 
 **Method** `DELETE`
 
-**URL:** `https://link-shorten-two.vercel.app/api/links/1"`
+**URL:** `https://link-shorten-two.vercel.app/api/links/:shortUrl"`
+
+```json
+EXAMPLE:
+https://link-shorten-two.vercel.app/api/links/60acfe58
+
+```
 
 **This is the link ues up update all link admin.**
 
 **Method** `PUT`
 
-**URL:** `https://link-shorten-two.vercel.app/api/links/1`
+**URL:** `https://link-shorten-two.vercel.app/api/links/:shortUrl`
 
-
+```json
+EXAMPLE:
+https://link-shorten-two.vercel.app/api/links/60acfe58
+REQUEST
+{
+  "original_url": "https://updated-original-url.com",
+  "new_short_url": "newshort123"
+}
+```
 
 
 # Custom Aliases API
