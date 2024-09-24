@@ -136,7 +136,7 @@ router.get('/links/view/:shortUrl', authenticateToken, async (req, res) => {
 
   try {
     const result = await pool.query(
-      'SELECT id,user_id, original_url, short_url, created_by, expires_at, click_count FROM shortened_urls WHERE short_url = $1',
+      'SELECT id,user_id, username,email,original_url, short_url, created_by, expires_at, click_count FROM shortened_urls WHERE short_url = $1',
       [shortUrl]
     );
 
@@ -148,6 +148,8 @@ router.get('/links/view/:shortUrl', authenticateToken, async (req, res) => {
     return res.json({
       id: urlData.id,
       userId: urlData.user_id,
+      username: urlData.username,
+      email: urlData.email,
       shortUrl: urlData.short_url,
       originalUrl: urlData.original_url,
       startDate: urlData.created_by,  
