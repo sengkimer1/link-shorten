@@ -136,7 +136,11 @@ router.get('/links/view/:shortUrl', authenticateToken, async (req, res) => {
 
   try {
     const result = await pool.query(
-      'SELECT id,user_id, username,email,original_url, short_url, created_by, expires_at, click_count FROM shortened_urls WHERE short_url = $1',
+      `SELECT su.id, su.original_url, su.short_url, su.created_by, su.expires_at, su.click_count, 
+              u.id AS user_id, u.username, u.email 
+       FROM shortened_urls su
+       JOIN users u ON su.created_by = u.id
+       WHERE su.short_url = $1`,
       [shortUrl]
     );
 
@@ -152,14 +156,16 @@ router.get('/links/view/:shortUrl', authenticateToken, async (req, res) => {
       email: urlData.email,
       shortUrl: urlData.short_url,
       originalUrl: urlData.original_url,
-      startDate: urlData.created_by,  
+      createdBy: urlData.created_by,
       expiryDate: urlData.expires_at,
-      clickCoun:urlData.click_count
+      clickCount: urlData.click_count
     });
   } catch (error) {
     return res.status(500).json({ error: 'Server error' });
   }
 });
+
+
 //Admin: Post for count click 
 router.post("/count/:shortUrl", authenticateToken, async (req, res) => {
   const { shortUrl } = req.params; 

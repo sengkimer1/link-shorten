@@ -85,7 +85,6 @@ REQUEST
 
 **URL:** `https://link-shorten-two.vercel.app/api/link_all`
 
-**This is the link ues for view information from short link admin.**
 
 **This is link for count click.**
  
@@ -98,7 +97,7 @@ EXAMPLE:
 https://link-shorten-two.vercel.app/api/count/60acfe58
 
 ```
- 
+ **This is the link ues for view information from short link admin.**
 
 **Method** `GET`
 
