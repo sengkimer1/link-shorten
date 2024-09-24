@@ -31,24 +31,45 @@ router.get('/links', authenticateToken, async (req, res) => {
     res.status(500).json({ response: 500, error: 'Something went wrong' });
   }
 });
-//Admin: Get link all 
+// Admin: Get all links with pagination
 router.get('/link_all', authenticateToken, async (req, res) => {
   try {
-    const result= await pool.query(
+    const page = parseInt(req.query.page) || 1;  // Default to page 1 if not provided
+    const limit = parseInt(req.query.limit) || 10;  // Default to 10 items per page
+    const offset = (page - 1) * limit;
+
+    const result = await pool.query(
       `SELECT l.short_url, l.click_count
        FROM shortened_urls l
        ORDER BY l.id DESC
-        LIMIT 10;`
+       LIMIT $1 OFFSET $2;`,
+      [limit, offset]
     );
+
+    const totalLinksResult = await pool.query('SELECT COUNT(*) FROM shortened_urls');
+    const totalLinks = parseInt(totalLinksResult.rows[0].count);
+    const totalPages = Math.ceil(totalLinks / limit);
+
     const links = result.rows.map(row => ({
       short_url: row.short_url,
       click_count: row.click_count
     }));
-    res.status(200).json({ code: 200, links });
+
+    res.status(200).json({
+      code: 200,
+      links,
+      pagination: {
+        totalLinks,
+        totalPages,
+        currentPage: page,
+        linksPerPage: limit
+      }
+    });
   } catch (error) {
     res.status(500).json({ response: 500, error: 'Something went wrong' });
   }
 });
+
 //Admin: Get all link by id
 router.get('/link_all/:id', authenticateToken, async (req, res) => {
   const { id } = req.params; 
